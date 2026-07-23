@@ -1,0 +1,821 @@
+<title>YUMSHOQ SHOP — превью Mini App (бренд-палитра)</title>
+<style>
+  :root{
+    --bg:#FAF6F1; --surface:#F1E7D8; --surface-2:#E8DAC3; --line:rgba(43,30,18,.12);
+    --text:#2A2118; --text-soft:#6b5f52; --text-faint:#9c8f7d;
+    --accent:#9C7B58; --accent-deep:#7A5C3E; --accent-tint:rgba(183,160,145,.22);
+    --danger:#B65B4C; --success:#6E8F5C; --pink:#C57B93;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; overflow-x:hidden; }
+  body{ background:#e9e6de; color:var(--text); font-family:var(--font); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  button, textarea, input{ font-family:inherit; }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+
+  .page{ max-width:960px; margin:0 auto; padding:48px 20px 80px; display:flex; flex-direction:column; align-items:center; }
+  .intro{ max-width:520px; text-align:center; margin-bottom:34px; }
+  .eyebrow{ margin:0 0 10px; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#9C7B58; font-weight:700; }
+  .intro h1{ font-weight:800; font-size:clamp(28px,5vw,36px); margin:0 0 10px; color:#2A2118; text-wrap:balance; letter-spacing:-.01em; }
+  .intro p{ margin:0; color:#6b5f52; font-size:14.5px; line-height:1.55; text-wrap:balance; }
+
+  .device{
+    width:min(390px,100%); background:var(--bg); border-radius:38px; border:1px solid #000;
+    box-shadow:0 30px 60px -28px rgba(0,0,0,.55); overflow:hidden; display:flex; flex-direction:column;
+    height:838px; max-height:84vh; position:relative;
+  }
+
+  .statusbar{ flex:0 0 auto; height:38px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:13px; font-weight:700; color:var(--text); }
+  .statusbar .icons{ display:flex; align-items:center; gap:5px; }
+  .sig{ display:flex; align-items:flex-end; gap:1.5px; height:9px; }
+  .sig i{ width:2.5px; background:var(--text); border-radius:1px; display:block; }
+  .sig i:nth-child(1){ height:4px; } .sig i:nth-child(2){ height:6px; } .sig i:nth-child(3){ height:7.5px; } .sig i:nth-child(4){ height:9px; }
+  .batt{ width:20px; height:10px; border:1.3px solid var(--text); border-radius:2.5px; position:relative; opacity:.95; }
+  .batt::after{ content:""; position:absolute; right:-3px; top:2.6px; width:1.6px; height:4.8px; background:var(--text); border-radius:0 1px 1px 0; }
+  .batt::before{ content:""; position:absolute; inset:1.4px; left:1.4px; width:14px; background:var(--text); border-radius:1px; }
+
+  .app-body{ flex:1 1 auto; position:relative; overflow:hidden; }
+  .screen{ position:absolute; inset:0; display:none; flex-direction:column; }
+  .screen.active{ display:flex; }
+  .screen-header{ flex:0 0 auto; display:flex; align-items:center; gap:10px; padding:6px 16px 14px; min-height:36px; }
+  .screen-header h2{ font-size:19px; font-weight:800; margin:0; flex:1; letter-spacing:-.01em; }
+  .icon-btn{ width:32px; height:32px; border-radius:50%; background:var(--surface); border:none; color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:0 0 auto; }
+  .icon-btn svg{ width:17px; height:17px; }
+  .icon-btn.ghost{ background:none; }
+  .link-btn{ background:none; border:none; color:var(--accent); font-size:13.5px; font-weight:700; cursor:pointer; padding:0; }
+  .screen-scroll{ flex:1 1 auto; overflow-y:auto; padding:0 16px 16px; }
+  .screen-fixed{ flex:0 0 auto; padding:10px 16px 18px; background:var(--bg); }
+
+  /* ---- HOME ---- */
+  /* Фон-фото остаётся тёмным и текстурным намеренно — как в реальных постах
+     @yumshoq_uz_ (тёмное дерево/глина под макро-фото мыла). Светлая
+     песочная палитра — это чистый интерфейс вокруг фото, а не сам фон фото. */
+  #screen-home .hero-photo{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(140% 90% at 25% 10%, rgba(183,160,145,.28), transparent 60%),
+      linear-gradient(155deg,#6b4a35 0%,#3a2a1c 42%,#1f150e 100%);
+  }
+  #screen-home .hero-photo::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 28% 34%, rgba(255,255,255,.07) 0, transparent 3%),
+      radial-gradient(circle at 62% 30%, rgba(255,255,255,.05) 0, transparent 2.4%),
+      radial-gradient(circle at 45% 62%, rgba(255,255,255,.06) 0, transparent 2.8%),
+      radial-gradient(circle at 70% 68%, rgba(255,255,255,.05) 0, transparent 2.2%);
+  }
+  .soap-stack{ position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); width:220px; height:140px; }
+  .soap-stack .bar{ position:absolute; border-radius:14px; box-shadow:0 18px 34px -14px rgba(0,0,0,.6), inset 0 2px 3px rgba(255,255,255,.25); }
+  .soap-stack .bar.b1{ width:190px; height:64px; left:10px; top:60px; background:linear-gradient(135deg,#c9b28a,#a68952); transform:rotate(-6deg); }
+  .soap-stack .bar.b2{ width:160px; height:56px; left:36px; top:8px; background:linear-gradient(135deg,#b39cd6,#7f63ad); transform:rotate(4deg);
+    background-image: radial-gradient(rgba(255,255,255,.35) 1.5px, transparent 2px), linear-gradient(135deg,#b39cd6,#7f63ad); background-size:9px 9px, auto; }
+  .hero-overlay{ position:absolute; left:0; right:0; bottom:0; height:62%; background:linear-gradient(180deg, transparent, rgba(31,21,14,.55) 40%, rgba(31,21,14,.97) 92%); }
+  #screen-home .hero-label{ position:absolute; top:14px; left:20px; font-size:13px; font-weight:700; color:#f5efe6; opacity:.85; z-index:2; }
+  #screen-home .hero-copy{ position:absolute; left:22px; right:22px; bottom:96px; z-index:2; }
+  #screen-home .hero-copy .brand{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#e4d3bb; font-weight:700; margin:0 0 10px; }
+  #screen-home .hero-copy h1{ font-size:25px; line-height:1.22; font-weight:800; margin:0 0 10px; text-wrap:balance; color:#f5efe6; }
+  #screen-home .hero-copy p{ font-size:13px; color:#cabfae; margin:0; line-height:1.5; max-width:30ch; }
+  #screen-home .hero-cta{ position:absolute; left:22px; right:22px; bottom:28px; z-index:2; }
+
+  .btn{
+    display:block; width:100%; text-align:center; padding:14px 16px; border-radius:14px; border:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent-deep)); color:#fff; font-weight:700; font-size:14.5px;
+    cursor:pointer;
+  }
+  .btn:active{ filter:brightness(.93); }
+  .btn.secondary{ background:none; border:1.5px solid var(--line); color:var(--text); }
+  .btn.small{ padding:9px 14px; font-size:13px; border-radius:10px; width:auto; }
+
+  /* ---- CATALOG ---- */
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--surface); border-radius:13px; padding:11px 14px; margin-bottom:12px; color:var(--text-faint); }
+  .search-bar svg{ width:17px; height:17px; flex:0 0 auto; }
+  .search-bar span{ font-size:13.5px; }
+  .chip-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:14px; scrollbar-width:none; }
+  .chip-row::-webkit-scrollbar{ display:none; }
+  .chip{ flex:0 0 auto; padding:8px 15px; border-radius:999px; background:var(--surface); border:none; color:var(--text-soft); font-size:13px; font-weight:700; cursor:pointer; }
+  .chip.active{ background:var(--accent); color:#fff; }
+
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .card{ background:var(--surface); border-radius:18px; overflow:hidden; text-align:left; cursor:pointer; padding:0; color:inherit; border:none; }
+  .card .photo{ height:118px; position:relative; }
+  .card .fav{ position:absolute; top:8px; right:8px; width:26px; height:26px; border-radius:50%; background:rgba(18,16,22,.5); backdrop-filter:blur(2px); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:2; }
+  .card .fav svg{ width:13px; height:13px; stroke:#fff; fill:none; }
+  .card .fav.on svg{ fill:var(--pink); stroke:var(--pink); }
+  .card .meta{ padding:10px 12px 13px; }
+  .card .name{ font-size:13px; font-weight:600; margin:0 0 6px; line-height:1.3; min-height:34px; }
+  .card .price{ font-variant-numeric:tabular-nums; font-weight:800; font-size:14px; }
+
+  .photo{ overflow:hidden; position:relative; }
+  .photo::before{ content:""; position:absolute; inset:0; background:radial-gradient(120% 100% at 30% 15%, rgba(255,255,255,.08), transparent 55%); }
+  .photo .bar{ position:absolute; inset:16%; border-radius:12px; box-shadow:0 10px 18px -8px rgba(0,0,0,.5), inset 0 2px 3px rgba(255,255,255,.2); }
+  .photo.lavender{ background:linear-gradient(160deg,#3a3348,#1c1826); }
+  .photo.lavender .bar{ background:linear-gradient(135deg,#b39cd6,#7f63ad); background-image:radial-gradient(rgba(255,255,255,.3) 1.2px, transparent 1.6px), linear-gradient(135deg,#b39cd6,#7f63ad); background-size:8px 8px, auto; }
+  .photo.coffee{ background:linear-gradient(160deg,#4a3323,#20150a); }
+  .photo.coffee .bar{ background:linear-gradient(135deg,#8a6142,#5b3d26); background-image:radial-gradient(rgba(0,0,0,.25) 1.4px, transparent 1.8px), linear-gradient(135deg,#8a6142,#5b3d26); background-size:7px 7px, auto; }
+  .photo.citrus{ background:linear-gradient(160deg,#5a6a35,#2a331a); }
+  .photo.citrus .bar{ background:linear-gradient(135deg,#d9d197,#b8ae6e); }
+  .photo.honey{ background:linear-gradient(160deg,#7a5c2c,#38290f); }
+  .photo.honey .bar{ background:repeating-linear-gradient(100deg,#e0c483 0 3px,#cdae66 3px 6px); }
+  .photo.scrub{ background:linear-gradient(160deg,#4a3323,#20150a); }
+  .photo.scrub .bar{ background:#7a5236; background-image:radial-gradient(rgba(255,255,255,.15) 1px, transparent 1.4px), radial-gradient(rgba(0,0,0,.2) 1px, transparent 1.4px); background-size:6px 6px,5px 5px; background-position:0 0, 3px 3px; }
+  .photo.giftset{ background:linear-gradient(160deg,#332a44,#1c1826); }
+  .photo.giftset .bar{ background:linear-gradient(135deg,#7f63ad 25%, #cdae66 25% 50%, #b8ae6e 50% 75%, #8a6142 75%); }
+  .photo.giftset .bar::after{ content:""; position:absolute; left:50%; top:0; bottom:0; width:8px; margin-left:-4px; background:#e0c483; }
+  .photo.shea{ background:linear-gradient(160deg,#4a3d2c,#221c12); }
+  .photo.shea .bar{ inset:26% 33%; border-radius:8px 8px 3px 3px; background:linear-gradient(#f2e6c8,#dcc793); }
+  .photo.shea .bar::after{ content:""; position:absolute; left:50%; top:-9px; transform:translateX(-50%); width:44%; height:12px; border-radius:5px 5px 0 0; background:#cbb47f; }
+
+  /* ---- PRODUCT ---- */
+  .p-photo{ height:230px; border-radius:20px; margin-bottom:16px; }
+  .p-photo .bar{ inset:14%; border-radius:18px; }
+  .p-name-price{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .p-name-price h2{ font-size:21px; font-weight:800; margin:0; text-wrap:balance; }
+  .p-name-price .price{ font-size:19px; font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .p-desc{ font-size:14px; line-height:1.6; color:var(--text-soft); margin:0 0 18px; }
+  .p-section-title{ font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; margin:0 0 8px; }
+  .p-ingredients{ font-size:13.5px; color:var(--text-soft); line-height:1.7; margin:0 0 18px; }
+  .qty-row{ display:flex; align-items:center; gap:12px; }
+  .stepper{ display:inline-flex; align-items:center; background:var(--surface); border-radius:12px; overflow:hidden; }
+  .stepper button{ width:38px; height:38px; border:none; background:none; color:var(--text); font-size:17px; cursor:pointer; }
+  .stepper .qty{ width:30px; text-align:center; font-variant-numeric:tabular-nums; font-weight:700; font-size:14.5px; }
+  .qty-row .btn{ flex:1; }
+
+  /* ---- CART ---- */
+  .cart-item{ display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+  .cart-item:first-child{ padding-top:2px; }
+  .cart-item .photo{ width:60px; height:60px; border-radius:13px; flex:0 0 auto; }
+  .cart-item .photo .bar{ inset:14%; border-radius:9px; }
+  .cart-item .ci-body{ flex:1; min-width:0; }
+  .cart-item .ci-name{ font-size:13.5px; font-weight:600; margin:0 0 4px; }
+  .cart-item .ci-unit{ font-size:11.5px; color:var(--text-faint); margin:0 0 6px; }
+  .cart-item .ci-row{ display:flex; align-items:center; justify-content:space-between; }
+  .trash{ background:none; border:none; color:var(--text-faint); cursor:pointer; padding:4px; flex:0 0 auto; }
+  .trash svg{ width:16px; height:16px; }
+  .stepper.sm button{ width:26px; height:26px; font-size:13px; }
+  .stepper.sm .qty{ width:22px; font-size:12.5px; }
+  .ci-price{ font-variant-numeric:tabular-nums; font-weight:700; font-size:13.5px; }
+
+  .points-toggle{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 14px; margin:14px 0 4px; background:var(--surface); border-radius:14px; }
+  .points-toggle .pt-label{ font-size:13px; font-weight:700; }
+  .points-toggle .pt-sub{ font-size:11.5px; color:var(--text-faint); margin-top:2px; }
+  .switch{ position:relative; width:42px; height:24px; flex:0 0 auto; }
+  .switch input{ position:absolute; inset:0; opacity:0; cursor:pointer; margin:0; }
+  .switch .track{ position:absolute; inset:0; border-radius:999px; background:var(--surface-2); }
+  .switch .thumb{ position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .15s; }
+  .switch input:checked + .track{ background:var(--accent); }
+  .switch input:checked + .track + .thumb{ transform:translateX(18px); }
+
+  .totals{ padding-top:6px; }
+  .totals .row{ display:flex; justify-content:space-between; font-size:13.5px; padding:5px 0; color:var(--text-soft); }
+  .totals .row span:last-child{ font-variant-numeric:tabular-nums; }
+  .totals .row.discount span:last-child{ color:var(--success); }
+  .fixed-total{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .fixed-total .lbl{ font-size:12px; color:var(--text-faint); }
+  .fixed-total .amt{ font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; }
+
+  /* ---- CHECKOUT ---- */
+  .field-group{ margin-bottom:18px; }
+  .field-group-title{ font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; margin:0 0 10px; }
+  .field{ background:var(--surface); border-radius:13px; padding:11px 14px; margin-bottom:8px; }
+  .field .flbl{ font-size:11px; color:var(--text-faint); margin:0 0 2px; }
+  .field .fval{ font-size:14px; font-weight:600; }
+  .radio-row{ display:flex; align-items:center; justify-content:space-between; background:var(--surface); border-radius:13px; padding:13px 14px; margin-bottom:8px; cursor:pointer; }
+  .radio-row .rl{ display:flex; align-items:center; gap:10px; }
+  .radio{ width:19px; height:19px; border-radius:50%; border:1.5px solid var(--text-faint); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .radio .dot{ width:9px; height:9px; border-radius:50%; background:var(--accent); opacity:0; }
+  .radio-row.active .radio{ border-color:var(--accent); }
+  .radio-row.active .radio .dot{ opacity:1; }
+  .radio-row .rname{ font-size:13.5px; font-weight:600; }
+  .radio-row .rprice{ font-size:13px; color:var(--text-soft); font-variant-numeric:tabular-nums; }
+  textarea.field-input{ width:100%; background:var(--surface); border:none; border-radius:13px; padding:12px 14px; color:var(--text); font-size:13.5px; resize:none; min-height:64px; }
+  textarea.field-input::placeholder{ color:var(--text-faint); }
+
+  /* ---- CONFIRM ---- */
+  .confirm-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 28px; text-align:center; }
+  .confirm-check{ width:84px; height:84px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-deep)); display:flex; align-items:center; justify-content:center; margin-bottom:22px; }
+  .confirm-check svg{ width:36px; height:36px; }
+  .confirm-wrap h2{ font-size:21px; font-weight:800; margin:0 0 8px; }
+  .confirm-wrap p{ font-size:13.5px; color:var(--text-soft); line-height:1.55; margin:0 0 22px; max-width:26ch; }
+  .confirm-num-lbl{ font-size:11.5px; color:var(--text-faint); margin-bottom:4px; }
+  .confirm-num{ font-size:20px; font-weight:800; margin-bottom:26px; font-variant-numeric:tabular-nums; }
+  .confirm-wrap .btn{ margin-bottom:10px; }
+
+  /* ---- ORDERS ---- */
+  .order-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 0; border-bottom:1px solid var(--line); cursor:pointer; }
+  .order-row:first-child{ padding-top:2px; }
+  .order-id{ font-size:14px; font-weight:700; margin:0 0 4px; }
+  .order-date{ font-size:12px; color:var(--text-faint); margin:0 0 4px; }
+  .order-sub{ font-size:12.5px; color:var(--text-soft); }
+  .order-status{ font-size:11.5px; font-weight:700; margin-top:6px; }
+  .order-status.active{ color:var(--accent); } .order-status.done{ color:var(--success); } .order-status.cancel{ color:var(--danger); }
+  .chev{ color:var(--text-faint); flex:0 0 auto; }
+
+  .od-row{ display:flex; justify-content:space-between; padding:9px 0; font-size:13.5px; color:var(--text-soft); border-bottom:1px solid var(--line); }
+  .od-row:last-child{ border-bottom:none; }
+  .od-row .val{ color:var(--text); font-weight:700; }
+  .od-status-val{ color:var(--accent); font-weight:700; }
+  .od-items .cart-item{ border-bottom:1px solid var(--line); }
+
+  /* ---- PROFILE ---- */
+  .profile-head{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:6px 0 20px; }
+  .avatar-wrap{ position:relative; margin-bottom:10px; }
+  .avatar{ width:84px; height:84px; border-radius:50%; background:var(--surface-2); display:flex; align-items:center; justify-content:center; }
+  .avatar svg{ width:30px; height:30px; color:var(--text-faint); }
+  .avatar-wrap .cam{ position:absolute; right:-2px; bottom:-2px; width:28px; height:28px; border-radius:50%; background:var(--accent); border:3px solid var(--bg); display:flex; align-items:center; justify-content:center; }
+  .avatar-wrap .cam svg{ width:13px; height:13px; color:#fff; }
+  .profile-head h3{ font-size:16px; font-weight:800; margin:0 0 2px; }
+  .profile-head p{ font-size:12.5px; color:var(--text-faint); margin:0; }
+
+  .loyalty-card{ background:linear-gradient(135deg, var(--accent-tint), var(--surface)); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:16px; }
+  .loyalty-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+  .loyalty-tier{ font-size:12.5px; font-weight:700; color:var(--accent); }
+  .loyalty-pts{ font-size:13px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .bar{ height:6px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
+  .bar .fill{ height:100%; background:var(--accent); border-radius:99px; }
+  .loyalty-sub{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-faint); margin-top:6px; }
+
+  .menu-card{ background:var(--surface); border-radius:16px; overflow:hidden; margin-bottom:14px; }
+  .menu-row{ display:flex; align-items:center; gap:12px; padding:13px 16px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .menu-row:last-child{ border-bottom:none; }
+  .menu-row svg{ width:18px; height:18px; color:var(--text-soft); flex:0 0 auto; }
+  .menu-row span{ flex:1; font-size:13.5px; font-weight:600; }
+
+  /* ---- FAVORITES ---- */
+  .fav-row{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .fav-row:first-child{ padding-top:2px; }
+  .fav-row .photo{ width:56px; height:56px; border-radius:12px; flex:0 0 auto; }
+  .fav-row .photo .bar{ inset:14%; border-radius:8px; }
+  .fav-row .fr-name{ flex:1; font-size:13.5px; font-weight:600; }
+  .fav-row .fr-price{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; margin-top:3px; }
+  .heart-btn{ background:none; border:none; cursor:pointer; padding:4px; }
+  .heart-btn svg{ width:18px; height:18px; fill:var(--pink); stroke:var(--pink); }
+
+  /* ---- TAB BAR ---- */
+  .tab-bar{ flex:0 0 auto; display:none; border-top:1px solid var(--line); padding:8px 6px 4px; }
+  .device.show-tabs .tab-bar{ display:flex; }
+  .tab{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 0 6px; background:none; border:none; color:var(--text-faint); cursor:pointer; position:relative; }
+  .tab svg{ width:22px; height:22px; }
+  .tab span{ font-size:10px; font-weight:700; }
+  .tab.active{ color:var(--accent); }
+  .tab-badge{ position:absolute; top:-2px; right:calc(50% - 16px); background:var(--accent); color:#fff; font-size:9px; font-weight:800; min-width:15px; height:15px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 3px; }
+  .home-indicator{ flex:0 0 auto; display:flex; justify-content:center; padding:8px 0 6px; }
+  .home-indicator span{ width:120px; height:4px; border-radius:99px; background:rgba(43,30,18,.35); }
+
+  .hint{ text-align:center; font-size:12px; color:#8a7d6c; margin-top:20px; max-width:340px; }
+
+  .admin-link{ margin-top:16px; background:none; border:1.5px dashed #cdbba3; color:#6b5f52; font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:11px; cursor:pointer; }
+  .admin-link:hover{ border-color:#9C7B58; color:#9C7B58; }
+
+  .form-label{ font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); font-weight:700; margin:0 0 8px; }
+  input.field-input{ width:100%; background:var(--surface); border:none; border-radius:13px; padding:12px 14px; color:var(--text); font-size:13.5px; }
+  input.field-input::placeholder, textarea.field-input::placeholder{ color:var(--text-faint); }
+  .photo-upload{ display:flex; align-items:center; gap:12px; background:var(--surface); border:1.5px dashed var(--line); border-radius:14px; padding:14px; cursor:pointer; margin-bottom:2px; }
+  .photo-upload .pu-icon{ width:44px; height:44px; border-radius:11px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .photo-upload .pu-icon svg{ width:20px; height:20px; color:var(--text-faint); }
+  .photo-upload .pu-text{ font-size:13px; font-weight:600; color:var(--text-soft); }
+  .photo-upload .pu-sub{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+  .cat-picker{ display:flex; gap:8px; flex-wrap:wrap; }
+  .cat-picker .chip{ padding:9px 14px; }
+
+  .toast{ position:absolute; left:16px; right:16px; bottom:96px; background:var(--success); color:#0d1f14; font-weight:700; font-size:13px; text-align:center; padding:11px; border-radius:12px; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .2s, transform .2s; z-index:5; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+
+<div class="page">
+  <header class="intro">
+    <p class="eyebrow">Превью интерфейса · бренд-палитра</p>
+    <h1>Yumshoq Shop — Mini App</h1>
+    <p>Светлая песочно-хлопковая тема (по brand-core.md) вместо тёмной с фиолетовым: акцент `#9C7B58`, фон `#FAF6F1`. Фото-хиро на главной остаётся тёмным намеренно — как в реальных постах @yumshoq_uz_.</p>
+  </header>
+
+  <div class="device show-tabs" id="device">
+    <div class="statusbar">
+      <span>9:41</span>
+      <div class="icons">
+        <div class="sig"><i></i><i></i><i></i><i></i></div>
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M1 8.5C4 5 11 5 14 8.5" stroke="#2A2118" stroke-width="1.4" stroke-linecap="round"/><path d="M3.3 7C5.5 4.8 9.5 4.8 11.7 7" stroke="#2A2118" stroke-width="1.4" stroke-linecap="round" opacity=".55"/></svg>
+        <div class="batt"></div>
+      </div>
+    </div>
+
+    <div class="app-body">
+
+      <!-- HOME -->
+      <section class="screen active" id="screen-home">
+        <div class="hero-photo"></div>
+        <div class="soap-stack"><div class="bar b1"></div><div class="bar b2"></div></div>
+        <div class="hero-overlay"></div>
+        <span class="hero-label">Yumshoq Shop</span>
+        <div class="hero-copy">
+          <p class="brand">Магазин мыла</p>
+          <h1>Натуральное мыло ручной работы</h1>
+          <p>Создано с любовью из натуральных ингредиентов</p>
+        </div>
+        <div class="hero-cta"><button class="btn" data-go="catalog">Перейти в каталог</button></div>
+      </section>
+
+      <!-- CATALOG -->
+      <section class="screen" id="screen-catalog">
+        <div class="screen-header"><h2>Каталог</h2></div>
+        <div class="screen-scroll">
+          <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <span>Поиск</span>
+          </div>
+          <div class="chip-row" id="chipRow">
+            <button class="chip active" data-cat="all">Все</button>
+            <button class="chip" data-cat="soap">Мыло</button>
+            <button class="chip" data-cat="scrub">Скрабы</button>
+            <button class="chip" data-cat="sets">Наборы</button>
+            <button class="chip" data-cat="care">Уход</button>
+          </div>
+          <div class="grid" id="productGrid"></div>
+        </div>
+      </section>
+
+      <!-- PRODUCT -->
+      <section class="screen" id="screen-product">
+        <div class="screen-header">
+          <button class="icon-btn" data-back="catalog" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span style="flex:1;"></span>
+          <button class="icon-btn" id="pFavBtn" aria-label="В избранное"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.7 9 2 5 5.6 5c2 0 3.3 1 4.4 2.4C11.1 6 12.4 5 14.4 5 18 5 19.3 9 21.5 12.5 19 16.65 12 21 12 21Z"/></svg></button>
+          <button class="icon-btn" aria-label="Поделиться"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8 15.8 6.4M8.2 13.2l7.6 4.4"/></svg></button>
+        </div>
+        <div class="screen-scroll">
+          <div class="photo p-photo" id="pPhoto"><div class="bar"></div></div>
+          <div class="p-name-price"><h2 id="pName">—</h2><span class="price" id="pPrice">0 сум</span></div>
+          <p class="p-desc" id="pDesc">—</p>
+          <p class="p-section-title">Состав</p>
+          <p class="p-ingredients" id="pIngredients">—</p>
+        </div>
+        <div class="screen-fixed">
+          <div class="qty-row">
+            <div class="stepper"><button id="qMinus" aria-label="Меньше">−</button><span class="qty" id="qVal">1</span><button id="qPlus" aria-label="Больше">+</button></div>
+            <button class="btn" id="addToCartBtn">В корзину</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- CART -->
+      <section class="screen" id="screen-cart">
+        <div class="screen-header"><h2>Корзина</h2><button class="link-btn">Изменить</button></div>
+        <div class="screen-scroll">
+          <div id="cartItems"></div>
+          <div class="points-toggle">
+            <div><div class="pt-label">Использовать баллы</div><div class="pt-sub">Доступно 12 400 · спишем до 20% суммы</div></div>
+            <label class="switch"><input type="checkbox" id="ptsToggle"><span class="track"></span><span class="thumb"></span></label>
+          </div>
+          <div class="totals">
+            <div class="row discount" id="tDiscRow" style="display:none;"><span>Баллами</span><span id="tDisc">−0 сум</span></div>
+          </div>
+        </div>
+        <div class="screen-fixed">
+          <div class="fixed-total"><span class="lbl">Итого</span><span class="amt" id="tGrand">0 сум</span></div>
+          <button class="btn" id="checkoutBtn">Оформить заказ</button>
+        </div>
+      </section>
+
+      <!-- CHECKOUT -->
+      <section class="screen" id="screen-checkout">
+        <div class="screen-header">
+          <button class="icon-btn" data-back="cart" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2>Оформление заказа</h2>
+        </div>
+        <div class="screen-scroll">
+          <div class="field-group">
+            <p class="field-group-title">Контактные данные</p>
+            <div class="field"><p class="flbl">Имя</p><p class="fval">Дилноза</p></div>
+            <div class="field"><p class="flbl">Телефон</p><p class="fval">+998 90 123-45-67</p></div>
+            <div class="field"><p class="flbl">Telegram</p><p class="fval">@dilnoza_soap</p></div>
+          </div>
+          <div class="field-group">
+            <p class="field-group-title">Способ доставки</p>
+            <div class="radio-row active" data-delivery="15000">
+              <div class="rl"><div class="radio"><div class="dot"></div></div><span class="rname">Доставка по городу</span></div>
+              <span class="rprice">15 000 сум</span>
+            </div>
+            <div class="radio-row" data-delivery="0">
+              <div class="rl"><div class="radio"><div class="dot"></div></div><span class="rname">Самовывоз</span></div>
+              <span class="rprice">Бесплатно</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <p class="field-group-title">Комментарий к заказу <span style="text-transform:none; font-weight:400;">(необязательно)</span></p>
+            <textarea class="field-input" placeholder="Например: позвонить перед доставкой"></textarea>
+          </div>
+        </div>
+        <div class="screen-fixed">
+          <div class="fixed-total"><span class="lbl">К оплате</span><span class="amt" id="checkoutTotal">0 сум</span></div>
+          <button class="btn" id="confirmOrderBtn">Подтвердить заказ</button>
+        </div>
+      </section>
+
+      <!-- CONFIRM -->
+      <section class="screen" id="screen-confirm">
+        <div class="confirm-wrap">
+          <div class="confirm-check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h2>Спасибо за заказ!</h2>
+          <p>Ваш заказ принят и скоро будет передан в обработку.</p>
+          <p class="confirm-num-lbl">Номер заказа:</p>
+          <p class="confirm-num">#1042</p>
+          <button class="btn" data-go="orders" style="width:220px;">Перейти в мои заказы</button>
+          <button class="btn secondary" data-go="home" style="width:220px;">На главную</button>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="screen" id="screen-orders">
+        <div class="screen-header">
+          <button class="icon-btn" data-back="profile" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2>Мои заказы</h2>
+        </div>
+        <div class="screen-scroll" id="ordersList"></div>
+      </section>
+
+      <!-- ORDER DETAIL -->
+      <section class="screen" id="screen-orderDetail">
+        <div class="screen-header">
+          <button class="icon-btn" data-back="orders" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2 id="odTitle">Заказ #1042</h2>
+        </div>
+        <div class="screen-scroll">
+          <div class="od-row"><span>Статус</span><span class="od-status-val" id="odStatus">Доставляется</span></div>
+          <p class="p-section-title" style="margin-top:16px;">Товары</p>
+          <div class="od-items" id="odItems"></div>
+          <div class="od-row" style="margin-top:8px;"><span>Доставка</span><span class="val" id="odDelivery">15 000 сум</span></div>
+          <div class="od-row"><span>Итого</span><span class="val" id="odTotal">99 000 сум</span></div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="screen" id="screen-profile">
+        <div class="screen-header"><h2>Профиль</h2></div>
+        <div class="screen-scroll">
+          <div class="profile-head">
+            <div class="avatar-wrap">
+              <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.2-4.2 4-6.4 7-6.4s5.8 2.2 7 6.4"/></svg></div>
+              <div class="cam"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3"/></svg></div>
+            </div>
+            <h3>Дилноза Юсупова</h3>
+            <p>@dilnoza_soap</p>
+          </div>
+
+          <div class="loyalty-card">
+            <div class="loyalty-top"><span class="loyalty-tier">Серебро · кэшбэк 3%</span><span class="loyalty-pts">12 400 баллов</span></div>
+            <div class="bar"><div class="fill" style="width:36%;"></div></div>
+            <div class="loyalty-sub"><span>860 000 сум</span><span>до Золота ещё 640 000 сум</span></div>
+          </div>
+
+          <div class="menu-card">
+            <div class="menu-row" data-go="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg><span>Мои заказы</span><span class="chev">›</span></div>
+            <div class="menu-row" data-go="favorites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.7 9 2 5 5.6 5c2 0 3.3 1 4.4 2.4C11.1 6 12.4 5 14.4 5 18 5 19.3 9 21.5 12.5 19 16.65 12 21 12 21Z"/></svg><span>Избранное</span><span class="chev">›</span></div>
+            <div class="menu-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10Z"/><circle cx="12" cy="11" r="2.2"/></svg><span>Адреса доставки</span><span class="chev">›</span></div>
+            <div class="menu-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg><span>Способы оплаты</span><span class="chev">›</span></div>
+            <div class="menu-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M9.2 9.6a2.8 2.8 0 0 1 5.4.9c0 1.8-2.4 2-2.4 3.6" /><circle cx="12" cy="17.1" r=".3" fill="currentColor"/></svg><span>Настройки</span><span class="chev">›</span></div>
+            <div class="menu-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M9.2 9.6a2.8 2.8 0 0 1 5.4.9c0 1.8-2.4 2-2.4 3.6" /><circle cx="12" cy="17.1" r=".3" fill="currentColor"/></svg><span>Помощь</span><span class="chev">›</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAVORITES -->
+      <section class="screen" id="screen-favorites">
+        <div class="screen-header">
+          <button class="icon-btn" data-back="profile" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2>Избранное</h2>
+        </div>
+        <div class="screen-scroll" id="favList"></div>
+      </section>
+
+      <!-- ADMIN: ADD PRODUCT -->
+      <section class="screen" id="screen-adminAdd">
+        <div class="screen-header">
+          <button class="icon-btn" data-back="catalog" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
+          <h2>Добавить товар</h2>
+        </div>
+        <div class="screen-scroll">
+          <p class="form-label">Фото товара</p>
+          <div class="photo-upload" id="photoUpload">
+            <div class="pu-icon" id="puIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3"/></svg></div>
+            <div><div class="pu-text" id="puText">Добавить фото</div><div class="pu-sub">JPG, PNG до 5 МБ</div></div>
+          </div>
+
+          <div class="field-group" style="margin-top:18px;">
+            <p class="form-label">Название</p>
+            <input class="field-input" id="fName" type="text" placeholder="Например: Мыло гранатовое">
+          </div>
+
+          <div class="field-group">
+            <p class="form-label">Категория</p>
+            <div class="cat-picker" id="catPicker">
+              <button class="chip active" data-pcat="soap">Мыло</button>
+              <button class="chip" data-pcat="scrub">Скрабы</button>
+              <button class="chip" data-pcat="sets">Наборы</button>
+              <button class="chip" data-pcat="care">Уход</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <p class="form-label">Описание</p>
+            <textarea class="field-input" id="fDesc" placeholder="Коротко о составе и пользе товара"></textarea>
+          </div>
+
+          <div class="field-group">
+            <p class="form-label">Цена, сум</p>
+            <input class="field-input" id="fPrice" type="number" inputmode="numeric" placeholder="28000">
+          </div>
+
+          <div class="field-group">
+            <p class="form-label">Количество на складе</p>
+            <input class="field-input" id="fQty" type="number" inputmode="numeric" placeholder="20">
+          </div>
+        </div>
+        <div class="screen-fixed">
+          <button class="btn" id="saveProductBtn">Сохранить товар</button>
+        </div>
+        <div class="toast" id="saveToast">Товар добавлен в каталог ✓</div>
+      </section>
+
+    </div>
+
+    <nav class="tab-bar">
+      <button class="tab active" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/></svg><span>Главная</span>
+      </button>
+      <button class="tab" data-tab="catalog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Каталог</span>
+      </button>
+      <button class="tab" data-tab="cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span>Корзина</span>
+        <span class="tab-badge" id="cartBadge">0</span>
+      </button>
+      <button class="tab" data-tab="profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg><span>Профиль</span>
+      </button>
+    </nav>
+    <div class="home-indicator"><span></span></div>
+  </div>
+
+  <p class="hint">Макет статичный — данные и цены условные, для демонстрации структуры экранов.</p>
+  <button class="admin-link" id="openAdminBtn">Форма добавления товара (админ) →</button>
+  <p class="hint" style="margin-top:8px;">В реальном приложении эта форма доступна только владельцу магазина — отдельно от покупательской части.</p>
+</div>
+
+<script>
+  const products = [
+    { id:'lavender', cat:'soap', name:'Лавандовое поле', price:27000, photo:'lavender',
+      desc:'Нежное мыло с лавандой для расслабления и ухода за кожей. Подходит для всех типов кожи.',
+      ing:'Оливковое масло, кокосовое масло, лавандовое масло, витамин E, натуральные красители.' },
+    { id:'coffee', cat:'soap', name:'Кофе и шоколад', price:29000, photo:'coffee',
+      desc:'Бодрящий аромат кофе и какао, лёгкий пилинг-эффект от молотых зёрен. Тонизирует кожу.',
+      ing:'Кокосовое масло, масло какао, молотый кофе, витамин E.' },
+    { id:'citrus', cat:'soap', name:'Цитрусовый заряд', price:26000, photo:'citrus',
+      desc:'Свежий цитрусовый аромат заряжает энергией с самого утра. Освежает и тонизирует.',
+      ing:'Оливковое масло, эфирное масло апельсина, цедра лимона, витамин E.' },
+    { id:'honey', cat:'soap', name:'Медовое удовольствие', price:28000, photo:'honey',
+      desc:'Мыло на основе овсяных хлопьев и мёда. Мягко очищает и глубоко увлажняет кожу.',
+      ing:'Мёд, овсяные хлопья, кокосовое масло, глицерин.' },
+    { id:'scrub', cat:'scrub', name:'Скраб кофейный антицеллюлитный', price:34000, photo:'scrub',
+      desc:'Молотый кофе и масло ши разглаживают кожу и улучшают тонус. Использовать 2–3 раза в неделю.',
+      ing:'Молотый кофе, масло ши, кокосовое масло, морская соль.' },
+    { id:'giftset', cat:'sets', name:'Набор «Для неё» — 3 мыла + скраб', price:118000, photo:'giftset',
+      desc:'Подарочный набор: три мыла ручной работы и кофейный скраб в крафтовой упаковке.',
+      ing:'Состав каждого товара — на индивидуальной этикетке в наборе.' },
+    { id:'shea', cat:'care', name:'Крем для рук с маслом ши', price:42000, photo:'shea',
+      desc:'Питательный крем на основе масла ши для сухой и уставшей кожи рук. Быстро впитывается.',
+      ing:'Масло ши, миндальное масло, витамин E, глицерин.' },
+  ];
+  const catLabel = { soap:'Мыло', scrub:'Скраб', sets:'Набор', care:'Уход' };
+  const fmt = n => n.toLocaleString('ru-RU') + ' сум';
+  const favorites = new Set(['lavender','citrus','honey']);
+
+  // ---- catalog ----
+  const grid = document.getElementById('productGrid');
+  function renderGrid(filter){
+    grid.innerHTML = '';
+    products.filter(p => filter==='all' || p.cat===filter).forEach(p => {
+      const card = document.createElement('button');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="photo ${p.photo}">
+          <button class="fav ${favorites.has(p.id)?'on':''}" data-fav="${p.id}"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-8.5C.7 9 2 5 5.6 5c2 0 3.3 1 4.4 2.4C11.1 6 12.4 5 14.4 5 18 5 19.3 9 21.5 12.5 19 16.65 12 21 12 21Z"/></svg></button>
+          <div class="bar"></div>
+        </div>
+        <div class="meta"><p class="name">${p.name}</p><span class="price">${fmt(p.price)}</span></div>`;
+      card.addEventListener('click', (e) => {
+        const favBtn = e.target.closest('[data-fav]');
+        if (favBtn){ toggleFav(favBtn.dataset.fav); favBtn.classList.toggle('on'); return; }
+        openProduct(p.id);
+      });
+      grid.appendChild(card);
+    });
+  }
+  function toggleFav(id){ favorites.has(id) ? favorites.delete(id) : favorites.add(id); }
+  document.getElementById('chipRow').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip'); if (!chip) return;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active'); renderGrid(chip.dataset.cat);
+  });
+  renderGrid('all');
+
+  // ---- product ----
+  let currentProduct = null, qty = 1;
+  function openProduct(id){
+    currentProduct = products.find(p => p.id === id); qty = 1;
+    document.getElementById('pPhoto').className = 'photo p-photo ' + currentProduct.photo;
+    document.getElementById('pPhoto').innerHTML = '<div class="bar"></div>';
+    document.getElementById('pName').textContent = currentProduct.name;
+    document.getElementById('pDesc').textContent = currentProduct.desc;
+    document.getElementById('pIngredients').textContent = currentProduct.ing;
+    document.getElementById('pFavBtn').classList.toggle('on', favorites.has(id));
+    updateProductPrice();
+    showScreen('product');
+  }
+  function updateProductPrice(){
+    document.getElementById('pPrice').textContent = fmt(currentProduct.price * qty);
+    document.getElementById('qVal').textContent = qty;
+  }
+  document.getElementById('qMinus').addEventListener('click', () => { if(qty>1){ qty--; updateProductPrice(); }});
+  document.getElementById('qPlus').addEventListener('click', () => { qty++; updateProductPrice(); });
+  document.getElementById('addToCartBtn').addEventListener('click', function(){
+    const idx = cart.findIndex(i => i.id === currentProduct.id);
+    if (idx>-1) cart[idx].qty += qty; else cart.push({ ...currentProduct, qty });
+    renderCart(); updateTotals();
+    const original = this.textContent; this.textContent = 'Добавлено ✓';
+    setTimeout(() => { this.textContent = original; }, 900);
+  });
+
+  // ---- cart ----
+  const cart = [
+    { ...products.find(p=>p.id==='lavender'), qty:1 },
+    { ...products.find(p=>p.id==='coffee'), qty:1 },
+    { ...products.find(p=>p.id==='honey'), qty:1 },
+  ];
+  const pointsBalance = 12400;
+  let deliveryFee = 15000;
+  const cartItemsEl = document.getElementById('cartItems');
+  function renderCart(){
+    cartItemsEl.innerHTML = '';
+    cart.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+      row.innerHTML = `
+        <div class="photo ${item.photo}"><div class="bar"></div></div>
+        <div class="ci-body">
+          <p class="ci-name">${item.name}</p>
+          <p class="ci-unit">${item.qty} шт. × ${fmt(item.price)}</p>
+          <div class="ci-row">
+            <div class="stepper sm"><button data-dec="${idx}">−</button><span class="qty">${item.qty}</span><button data-inc="${idx}">+</button></div>
+            <span class="ci-price">${fmt(item.price*item.qty)}</span>
+          </div>
+        </div>
+        <button class="trash" data-del="${idx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/></svg></button>`;
+      cartItemsEl.appendChild(row);
+    });
+    cartItemsEl.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => { cart[b.dataset.inc].qty++; renderCart(); updateTotals(); }));
+    cartItemsEl.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => { const it=cart[b.dataset.dec]; if(it.qty>1){ it.qty--; renderCart(); updateTotals(); } else { cart.splice(b.dataset.dec,1); renderCart(); updateTotals(); } }));
+    cartItemsEl.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { cart.splice(b.dataset.del,1); renderCart(); updateTotals(); }));
+    document.getElementById('cartBadge').textContent = cart.reduce((s,i)=>s+i.qty,0);
+  }
+  function cartSubtotal(){ return cart.reduce((s,i)=>s+i.price*i.qty,0); }
+  function updateTotals(){
+    const subtotal = cartSubtotal();
+    const capByPercent = Math.floor(subtotal*0.2);
+    const usePoints = document.getElementById('ptsToggle').checked;
+    const discount = usePoints ? Math.min(pointsBalance, capByPercent) : 0;
+    document.getElementById('tDiscRow').style.display = usePoints ? 'flex' : 'none';
+    document.getElementById('tDisc').textContent = '−' + fmt(discount);
+    document.getElementById('tGrand').textContent = fmt(subtotal - discount);
+    updateCheckoutTotal();
+  }
+  document.getElementById('ptsToggle').addEventListener('change', updateTotals);
+  renderCart(); updateTotals();
+
+  // ---- checkout ----
+  document.querySelectorAll('.radio-row').forEach(row => {
+    row.addEventListener('click', () => {
+      document.querySelectorAll('.radio-row').forEach(r => r.classList.remove('active'));
+      row.classList.add('active');
+      deliveryFee = Number(row.dataset.delivery);
+      updateCheckoutTotal();
+    });
+  });
+  function updateCheckoutTotal(){
+    document.getElementById('checkoutTotal').textContent = fmt(cartSubtotal() + deliveryFee);
+  }
+  document.getElementById('checkoutBtn').addEventListener('click', () => { updateCheckoutTotal(); showScreen('checkout'); });
+  document.getElementById('confirmOrderBtn').addEventListener('click', () => showScreen('confirm'));
+
+  // ---- orders ----
+  const orders = [
+    { id:'1042', date:'15.07.2026, 14:30', count:3, sum:99000, status:'active', statusLabel:'Доставляется',
+      items:[ {name:'Лавандовое поле', qty:1, price:27000, photo:'lavender'}, {name:'Кофе и шоколад', qty:1, price:29000, photo:'coffee'}, {name:'Медовое удовольствие', qty:1, price:28000, photo:'honey'} ], delivery:15000 },
+    { id:'1031', date:'02.07.2026, 12:20', count:2, sum:55000, status:'done', statusLabel:'Выполнен',
+      items:[ {name:'Цитрусовый заряд', qty:1, price:26000, photo:'citrus'}, {name:'Скраб кофейный антицеллюлитный', qty:1, price:34000+(-5000), photo:'scrub'} ], delivery:0 },
+    { id:'1020', date:'20.06.2026, 10:05', count:1, sum:27000, status:'cancel', statusLabel:'Отменён',
+      items:[ {name:'Лавандовое поле', qty:1, price:27000, photo:'lavender'} ], delivery:0 },
+  ];
+  const ordersList = document.getElementById('ordersList');
+  function renderOrders(){
+    ordersList.innerHTML = orders.map(o => `
+      <div class="order-row" data-order="${o.id}">
+        <div>
+          <p class="order-id">Заказ №${o.id}</p>
+          <p class="order-date">${o.date}</p>
+          <p class="order-sub">${o.count} товара на сумму ${fmt(o.sum)}</p>
+          <p class="order-status ${o.status}">${o.statusLabel}</p>
+        </div>
+        <span class="chev">›</span>
+      </div>`).join('');
+    ordersList.querySelectorAll('[data-order]').forEach(row => row.addEventListener('click', () => openOrderDetail(row.dataset.order)));
+  }
+  renderOrders();
+  function openOrderDetail(id){
+    const o = orders.find(x => x.id === id);
+    document.getElementById('odTitle').textContent = 'Заказ #' + o.id;
+    document.getElementById('odStatus').textContent = o.statusLabel;
+    document.getElementById('odDelivery').textContent = o.delivery ? fmt(o.delivery) : 'Бесплатно';
+    document.getElementById('odTotal').textContent = fmt(o.sum);
+    document.getElementById('odItems').innerHTML = o.items.map(it => `
+      <div class="cart-item"><div class="photo ${it.photo}"><div class="bar"></div></div>
+        <div class="ci-body"><p class="ci-name">${it.name}</p><p class="ci-unit">${it.qty} шт. × ${fmt(it.price)}</p></div>
+      </div>`).join('');
+    showScreen('orderDetail');
+  }
+
+  // ---- favorites ----
+  const favList = document.getElementById('favList');
+  function renderFavorites(){
+    favList.innerHTML = [...favorites].map(id => {
+      const p = products.find(x => x.id === id);
+      return `<div class="fav-row"><div class="photo ${p.photo}"><div class="bar"></div></div>
+        <div><p class="fr-name">${p.name}</p><p class="fr-price">${fmt(p.price)}</p></div>
+        <button class="heart-btn" data-unfav="${id}"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-8.5C.7 9 2 5 5.6 5c2 0 3.3 1 4.4 2.4C11.1 6 12.4 5 14.4 5 18 5 19.3 9 21.5 12.5 19 16.65 12 21 12 21Z"/></svg></button>
+      </div>`;
+    }).join('');
+    favList.querySelectorAll('[data-unfav]').forEach(b => b.addEventListener('click', () => { favorites.delete(b.dataset.unfav); renderFavorites(); renderGrid(document.querySelector('.chip.active').dataset.cat); }));
+  }
+
+  // ---- admin: add product ----
+  const catSwatch = { soap:'lavender', scrub:'scrub', sets:'giftset', care:'shea' };
+  let selectedPCat = 'soap', photoAdded = false;
+  document.getElementById('catPicker').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip'); if (!chip) return;
+    document.querySelectorAll('#catPicker .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedPCat = chip.dataset.pcat;
+  });
+  document.getElementById('photoUpload').addEventListener('click', function(){
+    photoAdded = true;
+    document.getElementById('puText').textContent = 'Фото выбрано ✓';
+    document.getElementById('puIcon').style.background = 'var(--accent-tint)';
+  });
+  function resetAdminForm(){
+    document.getElementById('fName').value = '';
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fPrice').value = '';
+    document.getElementById('fQty').value = '';
+    document.getElementById('puText').textContent = 'Добавить фото';
+    document.getElementById('puIcon').style.background = '';
+    photoAdded = false;
+    selectedPCat = 'soap';
+    document.querySelectorAll('#catPicker .chip').forEach((c,i) => c.classList.toggle('active', i===0));
+  }
+  document.getElementById('saveProductBtn').addEventListener('click', () => {
+    const name = document.getElementById('fName').value.trim();
+    const price = Number(document.getElementById('fPrice').value);
+    if (!name || !price){
+      document.getElementById('fName').focus();
+      return;
+    }
+    const id = 'custom-' + Date.now();
+    const desc = document.getElementById('fDesc').value.trim() || 'Описание появится позже.';
+    products.push({ id, cat:selectedPCat, name, price, photo:catSwatch[selectedPCat], desc, ing:'Уточняется у продавца.' });
+    renderGrid(document.querySelector('#chipRow .chip.active').dataset.cat);
+    const toast = document.getElementById('saveToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1800);
+    resetAdminForm();
+    setTimeout(() => showScreen('catalog'), 700);
+  });
+  document.getElementById('openAdminBtn').addEventListener('click', () => showScreen('adminAdd'));
+
+  // ---- navigation ----
+  const tabScreens = ['home','catalog','cart','profile'];
+  const showTabsFor = ['home','catalog','cart','profile','orders','favorites'];
+  const activeTabFor = { home:'home', catalog:'catalog', cart:'cart', profile:'profile', orders:'profile', favorites:'profile' };
+  function showScreen(name){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-'+name).classList.add('active');
+    document.getElementById('device').classList.toggle('show-tabs', showTabsFor.includes(name));
+    const activeTab = activeTabFor[name];
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeTab));
+    if (name === 'favorites') renderFavorites();
+  }
+  document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => showScreen(tab.dataset.tab)));
+  document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', () => showScreen(el.dataset.go)));
+  document.querySelectorAll('[data-back]').forEach(el => el.addEventListener('click', () => showScreen(el.dataset.back)));
+</script>
